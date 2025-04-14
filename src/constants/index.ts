@@ -167,3 +167,94 @@ export const navItems: NavItem[] = [
     href: "#",
   },
 ];
+
+export const footerLinks = [
+  {
+    title: "Product",
+    links: [
+      {
+        title: "Grid & Layouts",
+        href: "#",
+      },
+      {
+        title: "Typography",
+        href: "#",
+      },
+      {
+        title: "Media Manager",
+        href: "#",
+      },
+      {
+        title: "Form Builder",
+        href: "#",
+      },
+      {
+        title: "Figma",
+        href: "#",
+      },
+      {
+        title: "Pop-Up Builder",
+        href: "#",
+      },
+      {
+        title: "Interaction & Animations",
+        href: "#",
+      },
+      {
+        title: "Accessibility",
+        href: "#",
+      },
+    ],
+  },
+
+  {
+    title: "Company",
+    links: [
+      {
+        title: "Affiliates",
+        href: "#",
+      },
+      {
+        title: "Terms & Privacy",
+        href: "#",
+      },
+      {
+        title: "Cookie",
+        href: "#",
+      },
+    ],
+  },
+
+  {
+    title: "Resources",
+    links: [
+      {
+        title: "Blog",
+        href: "#",
+      },
+      {
+        title: "Documentation",
+        href: "#",
+      },
+      {
+        title: "Release Notes",
+        href: "#",
+      },
+    ],
+  },
+
+  {
+    title: "Support",
+    links: [
+      {
+        title: "Pricing",
+        href: "#",
+      },
+
+      {
+        title: "Contact Us",
+        href: "#",
+      },
+    ],
+  },
+];
