@@ -1,4 +1,5 @@
 import { StaticImageData } from "next/image";
+import { ReactNode } from "react";
 
 export interface MenuItem {
   id: number;
@@ -22,4 +23,16 @@ export interface TimelineFeature {
   path: string;
   showMore: boolean;
   image: string | StaticImageData;
+}
+
+export interface CardContentProps {
+  title: string | ReactNode;
+  description: string;
+  icon: any | null;
+  titleStyle?: string;
+  descriptionStyle?: string;
+  iconStyle?: string;
+  containerStyle?: string;
+  textContainerStyle?: string;
+  className?: string;
 }

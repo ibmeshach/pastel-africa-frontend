@@ -18,6 +18,8 @@ import contact from "./support/contact.svg";
 import feature from "./support/feature.svg";
 import support from "./support/support.svg";
 
+import { appIntegrationIcons } from "./appIntegration";
+
 const products = {
   accessibility,
   animation,
@@ -43,4 +45,5 @@ export default {
   products,
   resources,
   supportItems,
+  appIntegrationIcons,
 };
