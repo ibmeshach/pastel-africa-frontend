@@ -1,3 +1,5 @@
+import { StaticImageData } from "next/image";
+
 export interface MenuItem {
   id: number;
   title: string;
@@ -11,4 +13,13 @@ export interface NavItem {
   title: string;
   href: string;
   menuItems?: MenuItem[];
+}
+
+export interface TimelineFeature {
+  id: number;
+  title: string;
+  content: string;
+  path: string;
+  showMore: boolean;
+  image: string | StaticImageData;
 }

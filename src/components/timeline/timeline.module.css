@@ -1,0 +1,109 @@
+/* Button hover effect */
+.timeline-content-button .icon {
+  transition: transform 300ms ease;
+}
+
+.timeline-content-button:hover .icon {
+  transform: translateX(4px);
+}
+
+/* Title animations */
+.title-active {
+  will-change: opacity, transform;
+  transition-property: opacity, transform;
+  transition-duration: 500ms;
+  transition-timing-function: ease;
+  opacity: 1;
+  transform: scaleX(1) scaleY(1);
+  transform-origin: left center;
+}
+
+.title-inactive {
+  will-change: opacity, transform;
+  transition-property: opacity, transform;
+  transition-duration: 500ms;
+  transition-timing-function: ease;
+  opacity: 0.5;
+  transform: scaleX(0.75) scaleY(0.75);
+  transform-origin: left center;
+}
+
+/* Content animations */
+.timeline-content {
+  will-change: transform, opacity, max-height;
+  transform-origin: top center;
+  overflow: hidden;
+}
+
+/* Open state */
+.timeline-content[data-state="open"] {
+  animation: slideDown 0.8s ease forwards;
+}
+
+/* Closed state */
+.timeline-content[data-state="closed"] {
+  animation: slideUp 0.8s ease forwards;
+}
+
+/* Slide animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-1rem);
+  }
+}
+
+.glow-effect {
+  animation: glowFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes glowFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
+.glow-pulse {
+  animation: glowFadeIn 0.6s ease-out forwards,
+    glowPulse 3s ease-in-out infinite 0.6s;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}

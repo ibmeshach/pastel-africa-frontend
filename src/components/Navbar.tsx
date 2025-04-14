@@ -3,23 +3,69 @@
 import images from "@/public/images";
 import Image from "next/image";
 import Navigation from "./navigation/Navigation";
-import { LuMenu } from "react-icons/lu";
-import { useState } from "react";
-import { navItems } from "@/constants";
-import classNames from "classnames";
-import { usePathname, useRouter } from "next/navigation";
-import { IoIosArrowDown } from "react-icons/io";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import MobileNavigation from "./navigation/MobileNavigation";
+import { useState, useEffect, useRef } from "react";
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const Navbar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(true);
+  const prevScrollPosRef = useRef<number>(0);
+
+  useEffect(() => {
+    // Set initial scroll position when component mounts
+    prevScrollPosRef.current = window.scrollY;
+
+    // Function to handle scroll events
+    const handleScroll = (): void => {
+      const currentScrollPos: number = window.scrollY;
+      const isScrollingUp: boolean =
+        prevScrollPosRef.current > currentScrollPos;
+
+      // Always show navbar when scrolling up, hide when scrolling down
+      // Regardless of position on the page
+      if (currentScrollPos < 10) {
+        setVisible(true); // Always show navbar at the very top of the page
+      } else {
+        setVisible(isScrollingUp);
+      }
+
+      // Update previous scroll position using ref
+      prevScrollPosRef.current = currentScrollPos;
+    };
+
+    // Throttle the scroll event to improve performance
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    const throttledScrollHandler = (): void => {
+      if (!scrollTimeout) {
+        scrollTimeout = setTimeout(() => {
+          handleScroll();
+          scrollTimeout = null;
+        }, 10); // Small timeout for performance
+      }
+    };
+
+    window.addEventListener("scroll", throttledScrollHandler);
+
+    // Clean up the event listener when component unmounts
+    return () => {
+      window.removeEventListener("scroll", throttledScrollHandler);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, []); // Empty dependency array, using ref instead
 
   return (
-    <div className="w-full max-lg:bg-[#ffffffb8]">
+    <motion.div
+      className="fixed top-0 w-full z-50 bg-[#ffffffb8] lg:bg-[#f5f5f7db] backdrop-blur-xl"
+      style={{
+        backdropFilter: "opacity(100%) blur(15px)",
+      }}
+      initial={{ translateY: 0 }}
+      animate={{ translateY: visible ? 0 : "-100%" }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+    >
       <div className="w-full container bg-transparent flex items-center justify-between h-16">
-        <div className=" flex items-center gap-12 xl:gap-16">
+        <div className="flex items-center gap-12 xl:gap-16">
           <Image alt="logo" className="w-16" src={images.logo} />
           <Navigation />
         </div>
@@ -60,7 +106,7 @@ const Navbar = () => {
       </div>
 
       <AnimatePresence>{isOpen && <MobileNavigation />}</AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 

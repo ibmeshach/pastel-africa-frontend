@@ -62,5 +62,5 @@
 }
 
 .container {
-  @apply mx-auto max-w-[90%] xl:max-w-[86%];
+  @apply mx-auto max-w-[90%] 2xl:max-w-[78%];
 }

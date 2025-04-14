@@ -36,9 +36,9 @@ const MobileNavigation = () => {
           duration: 0.25,
         },
       }}
-      className="lg:hidden fixed inset-x-0 top-[4rem] bottom-0 z-50 bg-[#ffffffb8] overflow-y-auto"
+      className="lg:hidden fixed inset-x-0 top-[4rem] bottom-0 z-50  bg-[#FCFCFD] overflow-y-auto"
     >
-      <div className="container py-8 flex flex-col gap-4">
+      <div className="container py-4 flex flex-col gap-4">
         {navItems.map((item) => (
           <div
             key={item.id}
