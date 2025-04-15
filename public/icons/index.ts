@@ -20,6 +20,11 @@ import support from "./support/support.svg";
 
 import { appIntegrationIcons } from "./appIntegration";
 
+import control from "./dependencies/control.svg";
+import dollar from "./dependencies/dollar.svg";
+import secure from "./dependencies/secure.svg";
+import workflow from "./dependencies/workflow.svg";
+
 const products = {
   accessibility,
   animation,
@@ -41,9 +46,17 @@ const supportItems = {
   support,
 };
 
+const dependencies = {
+  control,
+  dollar,
+  secure,
+  workflow,
+};
+
 export default {
   products,
   resources,
   supportItems,
   appIntegrationIcons,
+  dependencies,
 };

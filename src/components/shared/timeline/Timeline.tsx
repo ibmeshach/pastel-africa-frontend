@@ -153,12 +153,10 @@ export default function Timeline({
       </div>
 
       <div
-        className={classNames(
-          "w-[50%] mt-8 rounded-[1.2rem] max-lg:hidden h-[30rem]",
-          {
-            "h-[28rem]": alignment === "right",
-          }
-        )}
+        className={classNames("w-[50%] mt-8 rounded-[1.2rem] max-lg:hidden", {
+          "h-[30rem]": alignment === "left",
+          "h-[28rem]": alignment === "right",
+        })}
       >
         <div
           ref={sliderContainerRef}
