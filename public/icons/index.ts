@@ -25,6 +25,10 @@ import dollar from "./dependencies/dollar.svg";
 import secure from "./dependencies/secure.svg";
 import workflow from "./dependencies/workflow.svg";
 
+import atom from "./atom.svg";
+
+import rocket from "./rocket.svg";
+
 const products = {
   accessibility,
   animation,
@@ -59,4 +63,6 @@ export default {
   supportItems,
   appIntegrationIcons,
   dependencies,
+  atom,
+  rocket,
 };

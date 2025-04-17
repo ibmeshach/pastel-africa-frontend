@@ -27,11 +27,32 @@ import safety from "./designBuild/safety.webp";
 import performance1 from "./performance/perf_image1.webp";
 import performance2 from "./performance/perf_image2.webp";
 
+import verticalSlider1 from "./vertical-slider/vertical-slider1.webp";
+import verticalSlider2 from "./vertical-slider/vertical-slider2.webp";
+import verticalSlider3 from "./vertical-slider/vertical-slider3.webp";
+import verticalSlider4 from "./vertical-slider/vertical-slider4.webp";
+import verticalSlider5 from "./vertical-slider/vertical-slider5.webp";
+import { swiperImages } from "./swiperAsset";
+
+import scale_image_1 from "./scale/scale_image_1.webp";
+import scale_image_2 from "./scale/scale_image_2.webp";
+import scale_image_3 from "./scale/scale_image_3.webp";
+
 const design = { image1, image2, image3, image4 };
 
 const craft = { image5, image6, image7, image8 };
 
 const performance = { performance1, performance2 };
+
+const scale = { scale_image_1, scale_image_2, scale_image_3 };
+
+const verticalSlider = {
+  verticalSlider1,
+  verticalSlider2,
+  verticalSlider3,
+  verticalSlider4,
+  verticalSlider5,
+};
 
 const designBuild = {
   ai,
@@ -44,6 +65,7 @@ const designBuild = {
   global,
   popUp,
   safety,
+  swiperImages,
 };
 
 export default {
@@ -52,6 +74,8 @@ export default {
   design,
   craft,
   performance,
+  scale,
+  verticalSlider,
   producedBy,
   designBuild,
 };

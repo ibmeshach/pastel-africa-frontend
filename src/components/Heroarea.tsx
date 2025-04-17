@@ -42,7 +42,7 @@ const Heroarea = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <button className="flex items-center justify-center rounded-[1.125rem] gap-2 bg-[#ebe8fe] text-secondary py-3 px-4 font-medium">
+              <button className="flex items-center justify-center rounded-[1.125rem] gap-2 bg-[#ebe8fe] text-secondary py-3 px-4 font-600">
                 <span className="font-600 text-sm lg:text-base">
                   Watch Intro
                 </span>

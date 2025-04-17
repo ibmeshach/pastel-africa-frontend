@@ -17,7 +17,7 @@ const AppIntegration = () => {
       <div className="container w-full flex flex-col gap-20 py-8 xs:py-12 sm:py-20">
         <AnimateHeader
           title={
-            <h2 className="text-black text-5xl xl:text-6xl 2xl:text-8xl leading-[1.1em] 2xl:tracking-[-5px] font-medium">
+            <h2 className="text-black text-5xl xl:text-6xl 2xl:text-8xl leading-[1.1em] 2xl:tracking-[-5px] font-500">
               App
               <br />
               integration

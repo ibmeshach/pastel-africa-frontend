@@ -16,9 +16,12 @@
 }
 
 @layer base {
-  html {
+  /* html {
     scroll-behavior: smooth;
-  }
+    scroll-snap-type: y mandatory;
+    overflow-y: auto;
+    overflow-x: hidden;
+  } */
 
   body {
     font-family: var(--font-inter);
