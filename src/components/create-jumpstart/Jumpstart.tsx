@@ -131,7 +131,7 @@ const Jumpstart = () => {
 
           <div className="w-full flex flex-col max-lg:gap-12">
             <h1
-              className="flex lg:self-end w-[70%] 2xs:w-[60%] sm:w-[50%] text-white text-[2.55rem] 2xs:text-[2.7rem] xs:text-[3rem] lg:text-[4rem] font-500"
+              className="flex lg:self-end w-[80%] 2xs:w-[70%] sm:w-[50%] text-white text-[2.55rem] 2xs:text-[2.7rem] xs:text-[3rem] lg:text-[4rem] font-500"
               style={{
                 letterSpacing: "-3px",
                 lineHeight: "1em",

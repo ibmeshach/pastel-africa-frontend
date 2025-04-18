@@ -151,30 +151,54 @@ const Create: React.FC = () => {
       }
     };
 
-    // Touch handlers with improved control
     let touchStartY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (!isComponentActive) return;
       touchStartY = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isComponentActive) return;
+      if (!isComponentActive || isAnimating.current) return;
 
-      // Don't prevent default events completely - this might be blocking scrolling
-      // only prevent when necessary
-      const touchDelta = touchStartY - e.touches[0].clientY;
+      const touchCurrentY = e.touches[0].clientY;
+      const touchDelta = touchStartY - touchCurrentY;
 
-      // Increase sensitivity for mobile
-      if (Math.abs(touchDelta) > 5) {
-        // Reduced from 10
+      // Reduced threshold for better mobile responsiveness
+      if (Math.abs(touchDelta) > 3) {
+        // Check if touch should be handled by our component
         if (
           (currentIndex > defaultIndex && touchDelta < 0) ||
           (currentIndex === defaultIndex && touchDelta > 0)
         ) {
-          e.preventDefault(); // Only prevent default when acting on our slider
-          handleScroll(touchDelta);
-          touchStartY = e.touches[0].clientY;
+          // Prevent default to stop page scrolling
+          e.preventDefault();
+
+          // Set flags immediately to prevent multiple rapid touches
+          isAnimating.current = true;
+          isSliderControlActive.current = true;
+
+          // Update the index based on swipe direction
+          if (touchDelta > 0 && currentIndex < maxIndex) {
+            setCurrentIndex(maxIndex);
+          } else if (touchDelta < 0 && currentIndex > defaultIndex) {
+            setCurrentIndex(defaultIndex);
+          } else {
+            // Release locks if not changing index
+            isAnimating.current = false;
+            isSliderControlActive.current = false;
+            return;
+          }
+
+          // Release animation lock after animation completes
+          setTimeout(() => {
+            isAnimating.current = false;
+
+            // Additional delay before allowing more touch events
+            setTimeout(() => {
+              isSliderControlActive.current = false;
+            }, 200); // Shorter cooldown for more responsive touch
+          }, animationDuration);
         }
       }
     };

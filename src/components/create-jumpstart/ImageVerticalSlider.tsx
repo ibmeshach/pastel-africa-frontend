@@ -37,36 +37,36 @@ const ImageVerticalSlider: React.FC<Props> = ({
   const defaultIndex = slides.findIndex((slide) => slide.id === 3);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate spring configuration based on animation duration
-  const springStiffness = 100;
-  const springDamping = animationDuration > 500 ? 26 : 22; // Increased damping for longer animations
+  // Calculate base spring configuration
+  const springStiffness = isMobile ? 120 : 100;
+  const springDamping = isMobile ? 20 : animationDuration > 500 ? 26 : 22; // Adjusted damping for device and animation duration
 
+  // Create spring with dynamic configuration
   const springY = useSpring(0, {
     stiffness: springStiffness,
     damping: springDamping,
-    mass: 0.8,
+    mass: isMobile ? 0.7 : 0.8,
     duration: animationDuration,
   });
 
-  // In ImageVerticalSlider.jsx
+  // Handle mobile detection and initial setup
   useEffect(() => {
     const checkMobile = () => {
       const isMobileView = window.innerWidth < 768;
       if (isMobile !== isMobileView) {
         setIsMobile(isMobileView);
-        // Force a re-render on mobile detection change
+
+        // Force update spring position with correct offset when device type changes
         if (containerRef.current) {
-          springY.set(
-            (currentIndex - defaultIndex) * (isMobileView ? -120 : -140)
-          );
+          const offset = isMobileView ? -100 : -140;
+          springY.set((currentIndex - defaultIndex) * offset);
         }
       }
     };
 
-    // Check immediately
+    // Check immediately and set up observer
     checkMobile();
 
-    // Use resize observer instead of event for better performance
     const resizeObserver = new ResizeObserver(checkMobile);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
@@ -75,11 +75,15 @@ const ImageVerticalSlider: React.FC<Props> = ({
     return () => resizeObserver.disconnect();
   }, [isMobile, currentIndex, defaultIndex, springY]);
 
+  // Update spring position when current index changes or device type changes
   useEffect(() => {
-    // Smooth animation to the target position
-    const targetY = (currentIndex - defaultIndex) * -140;
+    // Different offsets for mobile and desktop
+    const offset = isMobile ? -100 : -140;
+    const targetY = (currentIndex - defaultIndex) * offset;
+
+    // Just set the target position - don't try to pass config options
     springY.set(targetY);
-  }, [currentIndex, springY, defaultIndex]);
+  }, [currentIndex, defaultIndex, isMobile, springY]);
 
   return (
     <div
@@ -150,7 +154,7 @@ const ImageVerticalSlider: React.FC<Props> = ({
                       type: "spring",
                       stiffness: springStiffness,
                       damping: springDamping,
-                      mass: 0.8,
+                      mass: isMobile ? 0.7 : 0.8,
                       duration: animationDuration * 0.8,
                     }}
                   />
@@ -169,7 +173,7 @@ const ImageVerticalSlider: React.FC<Props> = ({
                     type: "spring",
                     stiffness: springStiffness,
                     damping: springDamping,
-                    mass: 0.8,
+                    mass: isMobile ? 0.7 : 0.8,
                     duration: animationDuration * 0.8,
                     opacity: { duration: animationDuration * 0.4 },
                     scale: { duration: animationDuration * 0.4 },
