@@ -10,7 +10,7 @@ interface MobileNavigationProps {
   onClose?: () => void;
 }
 
-const MobileNavigation: React.FC<MobileNavigationProps> = ({ onClose }) => {
+const MobileNavigation: React.FC<MobileNavigationProps> = () => {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
 

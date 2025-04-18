@@ -153,11 +153,9 @@ const Create: React.FC = () => {
 
     // Touch handlers with improved control
     let touchStartY = 0;
-    let touchStartTime = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
-      touchStartTime = Date.now();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
