@@ -2,7 +2,7 @@ import { navItems } from "@/constants";
 import classNames from "classnames";
 import React, { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 

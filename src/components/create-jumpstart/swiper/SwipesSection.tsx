@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import OscillatingSwiper from "./OscillatingSwiper";
 import { swiperImages } from "@/public/images/swiperAsset";
 

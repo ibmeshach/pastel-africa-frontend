@@ -1,17 +1,12 @@
 "use client";
 
 import icons from "@/public/icons";
-import images from "@/public/images";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import SwipesSection from "./swiper/SwipesSection";
 
 const Jumpstart = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
-  const [globalPosition, setGlobalPosition] = useState({ x: 0, y: 0 });
-
   useEffect(() => {
     // Create the effect element that will be positioned fixed on the screen
     const effectElement = document.createElement("div");
@@ -77,7 +72,6 @@ const Jumpstart = () => {
 
       // Store current visibility state
       const shouldBeVisible = isWithinComponent || isWithinRange;
-      setIsVisible(shouldBeVisible);
 
       // Update the effect element
       const effect = document.getElementById("jumpstart-mouse-effect");
@@ -86,18 +80,6 @@ const Jumpstart = () => {
         effect.style.left = `${e.clientX}px`;
         effect.style.top = `${e.clientY}px`;
       }
-
-      // Update relative position for component rendering
-      setMousePosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-
-      // Update global position
-      setGlobalPosition({
-        x: e.clientX,
-        y: e.clientY,
-      });
     };
 
     // Add global mouse move listener
@@ -137,7 +119,7 @@ const Jumpstart = () => {
         />
 
         <div className="container flex flex-col gap-10 relative z-[1001]">
-          <div className="flex w-full">
+          <div className="max-lg:hidden flex w-full">
             <div className="w-[52%]"></div>
             <motion.h1
               className={`w-[48%] text-[150px] font-600 text-white`}

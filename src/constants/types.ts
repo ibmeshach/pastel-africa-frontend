@@ -28,7 +28,7 @@ export interface TimelineFeature {
 export interface CardContentProps {
   title: string | ReactNode;
   description: string;
-  icon: any | null;
+  icon: string | StaticImageData | null;
   titleStyle?: string;
   descriptionStyle?: string;
   iconStyle?: string;

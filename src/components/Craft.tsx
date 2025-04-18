@@ -1,12 +1,10 @@
 "use client";
 
 import classNames from "classnames";
-import React, { useRef, useState, useEffect } from "react";
-import { AnimatePresence, motion, useInView } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import Timeline from "./shared/timeline/Timeline";
 import images from "@/public/images";
-import { TimelineFeature } from "@/constants/types";
-import Image from "next/image";
 
 const features = [
   {

@@ -1,15 +1,75 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useScroll,
+  useTransform,
+  MotionValue,
+} from "framer-motion";
 import classNames from "classnames";
 import ScaleBusinesContentCard from "./shared/ScaleBusinesContentCard";
 import { scaleBusinessContentCards } from "@/constants";
+import { StaticImageData } from "next/image";
 
-interface MousePosition {
-  x: number;
-  y: number;
+interface CardProps {
+  title: string;
+  description: string;
+  image: StaticImageData;
+  id: string | number;
 }
+
+interface AnimatedCardProps {
+  card: CardProps;
+  index: number;
+  totalCards: number;
+  scrollYProgress: MotionValue<number>;
+}
+
+// Separate component for animated cards
+const AnimatedCard: React.FC<AnimatedCardProps> = ({
+  card,
+  index,
+  totalCards,
+  scrollYProgress,
+}) => {
+  // Each component instance has its own hooks at the top level
+  const scrollSegment = 0.8 / totalCards;
+  const startPoint = index * scrollSegment;
+  const endPoint = startPoint + scrollSegment;
+
+  // Use useTransform hook properly at the component top level
+  const cardY = useTransform(
+    scrollYProgress,
+    [startPoint, endPoint],
+    ["100vh", "0vh"]
+  );
+
+  const cardOpacity = useTransform(
+    scrollYProgress,
+    [startPoint, startPoint + 0.3 * scrollSegment, endPoint],
+    [0, 1, 1]
+  );
+
+  return (
+    <motion.div
+      className="w-full absolute left-0"
+      style={{
+        y: cardY,
+        opacity: cardOpacity,
+        zIndex: index,
+      }}
+      initial={{ y: "100vh", opacity: 0 }}
+    >
+      <ScaleBusinesContentCard
+        title={card.title}
+        description={card.description}
+        image={card.image}
+      />
+    </motion.div>
+  );
+};
 
 const Scale = () => {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -25,7 +85,7 @@ const Scale = () => {
   });
 
   return (
-    <div ref={containerRef} className="w-full bg-black my-20">
+    <div ref={containerRef} className="w-full bg-black py-20">
       <div className="container w-full flex flex-col gap-16 md:gap-20 lg:gap-24 xl:gap-28 2xl:gap-32 py-16 xs:py-20 sm:py-32">
         <motion.h1
           ref={ref}
@@ -64,51 +124,15 @@ const Scale = () => {
 
         <div ref={cardsContainerRef} className="w-full relative min-h-[200vh]">
           <div className="sticky top-0 h-screen flex items-center justify-center">
-            {" "}
-            {/* Added top offset */}
-            {scaleBusinessContentCards?.map((card, index) => {
-              const totalCards = scaleBusinessContentCards.length;
-              const scrollSegment = 0.8 / totalCards;
-              const startPoint = index * scrollSegment;
-              const endPoint = startPoint + scrollSegment;
-
-              const cardProgress = useTransform(
-                scrollYProgress,
-                [startPoint, endPoint],
-                [0, 1]
-              );
-
-              const cardY = useTransform(
-                cardProgress,
-                [0, 1],
-                ["100vh", "0vh"]
-              );
-
-              const cardOpacity = useTransform(
-                cardProgress,
-                [0, 0.3, 1],
-                [0, 1, 1]
-              );
-
-              return (
-                <motion.div
-                  key={card.id}
-                  className="w-full absolute left-0"
-                  style={{
-                    y: cardY,
-                    opacity: cardOpacity,
-                    zIndex: index,
-                  }}
-                  initial={{ y: "100vh", opacity: 0 }}
-                >
-                  <ScaleBusinesContentCard
-                    title={card.title}
-                    description={card.description}
-                    image={card.image}
-                  />
-                </motion.div>
-              );
-            })}
+            {scaleBusinessContentCards?.map((card, index) => (
+              <AnimatedCard
+                key={card.id}
+                card={card}
+                index={index}
+                totalCards={scaleBusinessContentCards.length}
+                scrollYProgress={scrollYProgress}
+              />
+            ))}
           </div>
         </div>
       </div>

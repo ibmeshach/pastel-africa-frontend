@@ -8,6 +8,7 @@ interface Props {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   orOpacity: number;
+  animationDuration?: number; // Duration for animations in ms
 }
 
 // Slide type
@@ -26,18 +27,25 @@ const slides: SlideItem[] = [
   { id: 6, image: images.verticalSlider.verticalSlider2 },
 ];
 
-const VerticalVariedSlider: React.FC<Props> = ({
+const ImageVerticalSlider: React.FC<Props> = ({
   currentIndex,
   setCurrentIndex,
   orOpacity,
+  animationDuration = 800, // Default animation duration
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const defaultIndex = slides.findIndex((slide) => slide.id === 3);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Calculate spring configuration based on animation duration
+  const springStiffness = 100;
+  const springDamping = animationDuration > 500 ? 26 : 22; // Increased damping for longer animations
+
   const springY = useSpring(0, {
-    stiffness: 80,
-    damping: 20,
-    mass: 0.5,
+    stiffness: springStiffness,
+    damping: springDamping,
+    mass: 0.8,
+    duration: animationDuration,
   });
 
   useEffect(() => {
@@ -57,7 +65,9 @@ const VerticalVariedSlider: React.FC<Props> = ({
   }, []);
 
   useEffect(() => {
-    springY.set((currentIndex - defaultIndex) * -140);
+    // Smooth animation to the target position
+    const targetY = (currentIndex - defaultIndex) * -140;
+    springY.set(targetY);
   }, [currentIndex, springY, defaultIndex]);
 
   return (
@@ -65,7 +75,7 @@ const VerticalVariedSlider: React.FC<Props> = ({
       ref={containerRef}
       className="flex gap-4 items-center h-fit bg-transparent overflow-hidden"
     >
-      <div className="w-[50%] relative flex flex-col items-center">
+      <div className="w-full lg:w-[50%] relative flex flex-col items-center ">
         <motion.div
           className="flex flex-col items-center"
           style={{ y: springY }}
@@ -127,9 +137,10 @@ const VerticalVariedSlider: React.FC<Props> = ({
                     }}
                     transition={{
                       type: "spring",
-                      stiffness: 300,
-                      damping: 30,
-                      mass: 0.5,
+                      stiffness: springStiffness,
+                      damping: springDamping,
+                      mass: 0.8,
+                      duration: animationDuration * 0.8,
                     }}
                   />
                 )}
@@ -141,22 +152,21 @@ const VerticalVariedSlider: React.FC<Props> = ({
                     height,
                     opacity,
                     scale: absPos === 0 && index >= defaultIndex ? 1 : 0.95,
-                    // filter: `blur(${Math.min(absPos * 1, 2)}px)`,
                     y: 0,
                   }}
                   transition={{
                     type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                    mass: 0.5,
-                    opacity: { duration: 0.3 },
-                    scale: { duration: 0.3 },
+                    stiffness: springStiffness,
+                    damping: springDamping,
+                    mass: 0.8,
+                    duration: animationDuration * 0.8,
+                    opacity: { duration: animationDuration * 0.4 },
+                    scale: { duration: animationDuration * 0.4 },
                   }}
                   onClick={() => {
                     // Only allow clicking to slides after defaultIndex
                     if (index >= defaultIndex) {
                       setCurrentIndex(index);
-                      springY.set((index - defaultIndex) * -140);
                     }
                   }}
                 >
@@ -169,7 +179,7 @@ const VerticalVariedSlider: React.FC<Props> = ({
                       objectFit: "cover",
                       width: "100%",
                       height: "100%",
-                      transition: "all 0.3s ease-out",
+                      transition: `all ${animationDuration * 0.4}ms ease-out`,
                     }}
                   />
                 </motion.div>
@@ -177,11 +187,11 @@ const VerticalVariedSlider: React.FC<Props> = ({
             );
           })}
           <motion.h1
-            className={`text-[150px] font-600 ${
+            className={`max-lg:hidden text-[150px] font-600 ${
               orOpacity === 1 ? "text-white" : "text-black"
             }`}
             animate={{ opacity: orOpacity }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: (animationDuration * 0.5) / 1000 }}
           >
             Or
           </motion.h1>
@@ -190,7 +200,7 @@ const VerticalVariedSlider: React.FC<Props> = ({
       <motion.div
         className="w-[50%] max-lg:hidden mt-20"
         animate={{ opacity: 1 - orOpacity }} // This will fade out as orOpacity increases
-        transition={{ duration: 0.5 }}
+        transition={{ duration: (animationDuration * 0.5) / 1000 }}
       >
         <Info />
       </motion.div>
@@ -198,4 +208,4 @@ const VerticalVariedSlider: React.FC<Props> = ({
   );
 };
 
-export default VerticalVariedSlider;
+export default ImageVerticalSlider;

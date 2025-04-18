@@ -1,12 +1,8 @@
 "use client";
 import classNames from "classnames";
 import { motion, useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ImageVerticalSlider from "./ImageVerticalSlider";
-import images from "@/public/images";
-import Image from "next/image";
-import icons from "@/public/icons";
-import { FaArrowRight } from "react-icons/fa6";
 import Info from "./Info";
 
 const Create: React.FC = () => {
@@ -20,6 +16,12 @@ const Create: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(defaultIndex);
   const [isComponentActive, setIsComponentActive] = useState(false);
   const isAnimating = useRef(false);
+
+  // Extended animation duration to ensure smoother transitions
+  const animationDuration = 800; // in milliseconds
+
+  // Track if we're in slider control mode
+  const isSliderControlActive = useRef(false);
 
   // Add opacity controls
   const [contentOpacity, setContentOpacity] = useState(1);
@@ -48,48 +50,56 @@ const Create: React.FC = () => {
     }
   }, [isComponentActive, currentIndex]);
 
-  // Handle both wheel and touch/scrollbar scrolling
-  const handleScroll = (delta: number) => {
-    if (!isComponentActive || isAnimating.current) return;
+  // Improved scroll handling function wrapped in useCallback
+  const handleScroll = useCallback(
+    (delta: number) => {
+      if (!isComponentActive || isAnimating.current) return;
 
-    // Scrolling down
-    if (delta > 0 && currentIndex < maxIndex) {
+      // Set animation lock
       isAnimating.current = true;
 
-      const animate = setInterval(() => {
-        setCurrentIndex((prev) => {
-          if (prev >= maxIndex) {
-            clearInterval(animate);
-            isAnimating.current = false;
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 100);
-    }
-    // Scrolling up
-    else if (delta < 0 && currentIndex > defaultIndex) {
-      isAnimating.current = true;
+      // Enable slider control mode to block all scrolling
+      isSliderControlActive.current = true;
 
-      const animate = setInterval(() => {
-        setCurrentIndex((prev) => {
-          if (prev <= defaultIndex) {
-            clearInterval(animate);
-            isAnimating.current = false;
-            return prev;
-          }
-          return prev - 1;
-        });
-      }, 100);
-    }
-  };
+      // Scrolling down - move to maxIndex (id 6)
+      if (delta > 0 && currentIndex < maxIndex) {
+        setCurrentIndex(maxIndex);
+      }
+      // Scrolling up - move to defaultIndex (id 3)
+      else if (delta < 0 && currentIndex > defaultIndex) {
+        setCurrentIndex(defaultIndex);
+      } else {
+        // If no action needed, release locks immediately
+        isAnimating.current = false;
+        isSliderControlActive.current = false;
+        return;
+      }
+
+      // Release the animation lock after animation completes
+      setTimeout(() => {
+        isAnimating.current = false;
+
+        // Keep slider control active for a bit longer to prevent immediate scrolling
+        setTimeout(() => {
+          isSliderControlActive.current = false;
+        }, 300); // Additional cooldown period
+      }, animationDuration);
+    },
+    [isComponentActive, currentIndex, animationDuration]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsComponentActive(entry.isIntersecting);
-        if (entry.isIntersecting) {
+        const isIntersecting = entry.isIntersecting;
+        setIsComponentActive(isIntersecting);
+
+        if (isIntersecting) {
           lastScrollPosition.current = window.scrollY;
+
+          // Reset the animation states when entering view
+          isAnimating.current = false;
+          isSliderControlActive.current = false;
         }
       },
       { threshold: 0.5 }
@@ -99,58 +109,127 @@ const Create: React.FC = () => {
       observer.observe(componentRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
-    // Mouse wheel handler
+    // Position threshold to determine if we should intercept scrolling
+    let lastWheelTimestamp = 0;
+    const wheelCooldown = 50; // ms between wheel events
+
+    // Mouse wheel handler with complete prevention
     const handleWheel = (e: WheelEvent) => {
-      if (!isComponentActive || isAnimating.current) return;
+      // Always check if component is in view first
+      if (!isComponentActive) return;
+
+      // If slider control is active or we're animating, prevent all scrolling
+      if (isSliderControlActive.current || isAnimating.current) {
+        e.preventDefault();
+        return;
+      }
+
+      // Apply cooldown between wheel events
+      const now = Date.now();
+      if (now - lastWheelTimestamp < wheelCooldown) {
+        e.preventDefault();
+        return;
+      }
+      lastWheelTimestamp = now;
+
+      // Handle scroll direction logic
       if (
-        currentIndex > defaultIndex ||
-        (currentIndex === defaultIndex && e.deltaY > 0)
+        (currentIndex > defaultIndex && e.deltaY < 0) || // Scrolling up while expanded
+        (currentIndex === defaultIndex && e.deltaY > 0) // Scrolling down while contracted
       ) {
         e.preventDefault();
         handleScroll(e.deltaY);
       }
     };
 
-    // Touch handlers
+    // Touch handlers with improved control
     let touchStartY = 0;
+    let touchStartTime = 0;
+
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isComponentActive || isAnimating.current) return;
-      const touchDelta = touchStartY - e.touches[0].clientY;
+      if (!isComponentActive) return;
 
-      if (
-        currentIndex > defaultIndex ||
-        (currentIndex === defaultIndex && touchDelta > 0)
-      ) {
+      // Block all touch movement while animating
+      if (isSliderControlActive.current || isAnimating.current) {
         e.preventDefault();
-        handleScroll(touchDelta);
-        touchStartY = e.touches[0].clientY;
+        return;
+      }
+
+      const touchDelta = touchStartY - e.touches[0].clientY;
+      const touchDuration = Date.now() - touchStartTime;
+
+      // Only respond if touch has moved enough and isn't too fast
+      if (Math.abs(touchDelta) > 10 && touchDuration > 50) {
+        if (
+          (currentIndex > defaultIndex && touchDelta < 0) || // Swiping up (moving finger down)
+          (currentIndex === defaultIndex && touchDelta > 0) // Swiping down (moving finger up)
+        ) {
+          e.preventDefault();
+          handleScroll(touchDelta);
+          // Reset after handling to prevent multiple triggers
+          touchStartY = e.touches[0].clientY;
+          touchStartTime = Date.now();
+        }
       }
     };
 
-    // Scrollbar/general scroll handler
+    // General scroll handler with improved prevention
+    let lastScrollTime = 0;
+    const scrollCooldown = 300; // ms between scroll events
+
     const handleScrollbar = () => {
-      if (!isComponentActive || isAnimating.current) return;
+      if (!isComponentActive) return;
+
+      // Block all scrolling while animating
+      if (isSliderControlActive.current || isAnimating.current) {
+        // Try to restore position to prevent movement
+        window.scrollTo(0, lastScrollPosition.current);
+        return;
+      }
+
+      // Apply cooldown between scroll events
+      const now = Date.now();
+      if (now - lastScrollTime < scrollCooldown) {
+        window.scrollTo(0, lastScrollPosition.current);
+        return;
+      }
+
       const currentScroll = window.scrollY;
       const delta = currentScroll - lastScrollPosition.current;
 
-      if (
-        currentIndex > defaultIndex ||
-        (currentIndex === defaultIndex && delta > 0)
-      ) {
-        handleScroll(delta);
+      // Only handle significant scroll changes
+      if (Math.abs(delta) > 5) {
+        if (
+          (currentIndex > defaultIndex && delta < 0) || // Scrolling up
+          (currentIndex === defaultIndex && delta > 0) // Scrolling down
+        ) {
+          // Store the time we processed this scroll
+          lastScrollTime = now;
+
+          // Handle the scroll action
+          handleScroll(delta);
+
+          // Force scroll position to stay the same
+          window.scrollTo(0, lastScrollPosition.current);
+        } else {
+          // Update scroll position for non-controlled scrolling
+          lastScrollPosition.current = currentScroll;
+        }
       }
-      lastScrollPosition.current = currentScroll;
     };
 
-    // Add event listeners
+    // Add event listeners with appropriate options
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
@@ -162,15 +241,15 @@ const Create: React.FC = () => {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("scroll", handleScrollbar);
     };
-  }, [isComponentActive, currentIndex]);
+  }, [isComponentActive, currentIndex, handleScroll]);
 
   return (
     <div
-      className="w-full"
+      className="w-full "
       ref={componentRef}
       style={{ backgroundColor: orOpacity === 1 ? "black" : "transparent" }}
     >
-      <div className="container w-full flex flex-col lg:flex-row pt-8 xs:pt-12 sm:pt-20">
+      <div className="container w-full flex flex-col lg:flex-row pt-16 xs:pt-20 lg:pt-32">
         <motion.div
           className="w-full md:w-[50%] relative"
           animate={{ opacity: contentOpacity }}
@@ -222,6 +301,7 @@ const Create: React.FC = () => {
               currentIndex={currentIndex}
               setCurrentIndex={setCurrentIndex}
               orOpacity={orOpacity}
+              animationDuration={animationDuration}
             />
           </div>
         </motion.div>

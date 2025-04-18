@@ -5,7 +5,6 @@ import classNames from "classnames";
 import { navItems } from "@/constants";
 import { MenuItem } from "@/constants/types";
 import { IoIosArrowDown } from "react-icons/io";
-import { forwardRef } from "react";
 import styles from "./styles.module.css";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
