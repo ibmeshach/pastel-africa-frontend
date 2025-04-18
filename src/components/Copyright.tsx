@@ -14,7 +14,11 @@ const Copyright = () => {
 
         <div className="flex items-center gap-2 max-md:justify-end col-span-1">
           <p className="text-[#00000099] font-300 text-sm">A Product by</p>
-          <Image alt="producedBy" src={images.producedBy} className="w-24" />
+          <Image
+            alt="producedBy"
+            src={images.producedBy}
+            className="w-20 xs:w-24"
+          />
         </div>
 
         <div className="w-fit cursor-pointer flex items-center rounded-sm bg-[#9353ff] max-md:col-span-2 md:justify-self-end">

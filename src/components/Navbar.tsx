@@ -12,6 +12,11 @@ const Navbar: React.FC = () => {
   const [visible, setVisible] = useState<boolean>(true);
   const prevScrollPosRef = useRef<number>(0);
 
+  // For debugging
+  useEffect(() => {
+    console.log("Mobile nav isOpen state:", isOpen);
+  }, [isOpen]);
+
   useEffect(() => {
     // Set initial scroll position when component mounts
     prevScrollPosRef.current = window.scrollY;
@@ -54,6 +59,10 @@ const Navbar: React.FC = () => {
     };
   }, []); // Empty dependency array, using ref instead
 
+  const toggleMobileNav = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <motion.div
       className="fixed top-0 w-full z-50 bg-[#ffffffb8] lg:bg-[#f5f5f7db] backdrop-blur-xl"
@@ -79,7 +88,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleMobileNav}
           className="lg:hidden relative w-7 h-7 flex items-center justify-center focus:outline-none"
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
@@ -105,7 +114,9 @@ const Navbar: React.FC = () => {
         </button>
       </div>
 
-      <AnimatePresence>{isOpen && <MobileNavigation />}</AnimatePresence>
+      <AnimatePresence>
+        {isOpen && <MobileNavigation onClose={() => setIsOpen(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 };

@@ -1,14 +1,24 @@
 import { navItems } from "@/constants";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
-const MobileNavigation = () => {
+interface MobileNavigationProps {
+  onClose?: () => void;
+}
+
+const MobileNavigation: React.FC<MobileNavigationProps> = ({ onClose }) => {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+
+  // For debugging
+  useEffect(() => {
+    console.log("MobileNavigation mounted");
+    return () => console.log("MobileNavigation unmounted");
+  }, []);
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -23,29 +33,23 @@ const MobileNavigation = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0, y: -10 }}
-      animate={{ opacity: 1, height: "auto", y: 0 }}
-      exit={{ opacity: 0, height: 0, y: -10 }}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "100vh" }}
+      exit={{ opacity: 0, height: 0 }}
       transition={{
-        duration: 0.4,
-        ease: [0.4, 0, 0.2, 1],
-        height: {
-          duration: 0.4,
-        },
-        opacity: {
-          duration: 0.25,
-        },
+        duration: 0.3,
+        ease: "easeInOut",
       }}
-      className="lg:hidden fixed inset-x-0 top-[4rem] bottom-0 z-50  bg-[#FCFCFD] overflow-y-auto"
+      className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-[#FCFCFD] overflow-y-auto"
     >
       <div className="container py-4 flex flex-col gap-4">
         {navItems.map((item) => (
           <div
             key={item.id}
-            className="flex flex-col gap-4   py-3.5 border-b border-[#5641f333]"
+            className="flex flex-col gap-4 py-3.5 border-b border-[#5641f333]"
           >
             <div
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 cursor-pointer"
               onClick={() => item.menuItems && toggleMenu(item.id)}
             >
               <p
@@ -69,18 +73,12 @@ const MobileNavigation = () => {
               item.menuItems.length > 0 &&
               openMenus[item.id] ? (
                 <motion.div
-                  initial={{ opacity: 0, height: 0, y: -10 }}
-                  animate={{ opacity: 1, height: "auto", y: 0 }}
-                  exit={{ opacity: 0, height: 0, y: -10 }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
                   transition={{
-                    duration: 0.4,
-                    ease: [0.4, 0, 0.2, 1],
-                    height: {
-                      duration: 0.4,
-                    },
-                    opacity: {
-                      duration: 0.25,
-                    },
+                    duration: 0.3,
+                    ease: "easeInOut",
                   }}
                   className="flex flex-col gap-10 py-3.5"
                 >
@@ -104,7 +102,7 @@ const MobileNavigation = () => {
 
         <div className="flex items-center gap-4 border-b border-[#5641f333] py-3.5">
           <p
-            className={classNames("font-500 text-lg", {
+            className={classNames("font-500 text-lg cursor-pointer", {
               "text-[#605c7a]": !isActive("#"),
               "text-black": isActive("#"),
             })}

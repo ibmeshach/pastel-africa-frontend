@@ -48,21 +48,32 @@ const ImageVerticalSlider: React.FC<Props> = ({
     duration: animationDuration,
   });
 
+  // In ImageVerticalSlider.jsx
   useEffect(() => {
-    // Handle initial check and window resize
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const isMobileView = window.innerWidth < 768;
+      if (isMobile !== isMobileView) {
+        setIsMobile(isMobileView);
+        // Force a re-render on mobile detection change
+        if (containerRef.current) {
+          springY.set(
+            (currentIndex - defaultIndex) * (isMobileView ? -120 : -140)
+          );
+        }
+      }
     };
 
-    // Initial check
+    // Check immediately
     checkMobile();
 
-    // Add resize listener
-    window.addEventListener("resize", checkMobile);
+    // Use resize observer instead of event for better performance
+    const resizeObserver = new ResizeObserver(checkMobile);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
 
-    // Cleanup
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    return () => resizeObserver.disconnect();
+  }, [isMobile, currentIndex, defaultIndex, springY]);
 
   useEffect(() => {
     // Smooth animation to the target position

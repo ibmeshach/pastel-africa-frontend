@@ -121,15 +121,18 @@ const Create: React.FC = () => {
 
     // Mouse wheel handler with complete prevention
     const handleWheel = (e: WheelEvent) => {
-      // Always check if component is in view first
       if (!isComponentActive) return;
 
-      // If slider control is active or we're animating, prevent all scrolling
+      // Only prevent default when we're actually going to handle the event
       if (isSliderControlActive.current || isAnimating.current) {
-        e.preventDefault();
+        if (
+          (currentIndex > defaultIndex && e.deltaY < 0) ||
+          (currentIndex === defaultIndex && e.deltaY > 0)
+        ) {
+          e.preventDefault();
+        }
         return;
       }
-
       // Apply cooldown between wheel events
       const now = Date.now();
       if (now - lastWheelTimestamp < wheelCooldown) {
@@ -160,26 +163,20 @@ const Create: React.FC = () => {
     const handleTouchMove = (e: TouchEvent) => {
       if (!isComponentActive) return;
 
-      // Block all touch movement while animating
-      if (isSliderControlActive.current || isAnimating.current) {
-        e.preventDefault();
-        return;
-      }
-
+      // Don't prevent default events completely - this might be blocking scrolling
+      // only prevent when necessary
       const touchDelta = touchStartY - e.touches[0].clientY;
-      const touchDuration = Date.now() - touchStartTime;
 
-      // Only respond if touch has moved enough and isn't too fast
-      if (Math.abs(touchDelta) > 10 && touchDuration > 50) {
+      // Increase sensitivity for mobile
+      if (Math.abs(touchDelta) > 5) {
+        // Reduced from 10
         if (
-          (currentIndex > defaultIndex && touchDelta < 0) || // Swiping up (moving finger down)
-          (currentIndex === defaultIndex && touchDelta > 0) // Swiping down (moving finger up)
+          (currentIndex > defaultIndex && touchDelta < 0) ||
+          (currentIndex === defaultIndex && touchDelta > 0)
         ) {
-          e.preventDefault();
+          e.preventDefault(); // Only prevent default when acting on our slider
           handleScroll(touchDelta);
-          // Reset after handling to prevent multiple triggers
           touchStartY = e.touches[0].clientY;
-          touchStartTime = Date.now();
         }
       }
     };
